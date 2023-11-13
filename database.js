@@ -129,6 +129,18 @@ async function updateMe(user){
   return result;
 }
 
+async function saveEdit(edit){
+  const db = await connect();
+  const result = await db.collection('Edit').insertOne(edit);
+  return result;
+}
+
+async function findRoleByName(name){
+  const db = await connect();
+  const role = await db.collection('Role').findOne({ name: name });
+  return role;
+}
+
 async function getCoasters() {
   const db = await connect();
   const coasters = await db.collection('Coasters').find({}).toArray();
@@ -137,4 +149,4 @@ async function getCoasters() {
 
 ping();
 
-export {connect, ping};
+export {connect, ping, getUsers, getUserById, registerUser, loginUser, updateUser, deleteUser, updateMe, getCoasters, newId, saveEdit, findRoleByName};

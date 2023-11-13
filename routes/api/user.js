@@ -183,14 +183,11 @@ router.get('/list', isLoggedIn(), hasPermission('canViewData'), async (req, res)
       match.creationDate = { $lt: pastMinDaysOld };
     }
     switch (sortBy) {
-      case 'givenName':
-        sort = { givenName: 1, familyName: 1, createdOn: 1 };
-        break;
-      case 'familyName':
-        sort = { familyName: 1, givenName: 1, createdOn: 1 };
+      case 'fullName':
+        sort = { fullName: 1, createdOn: 1 };
         break;
       case 'role':
-        sort = { role: 1, givenName: 1, familyName: 1, createdOn: 1 };
+        sort = { role: 1, fullName: 1, createdOn: 1 };
         break;
       case 'newest':
         sort = { createdOn: -1 };
@@ -199,7 +196,7 @@ router.get('/list', isLoggedIn(), hasPermission('canViewData'), async (req, res)
         sort = { createdOn: 1 };
         break;
       default:
-        sort = { givenName: 1, familyName: 1, createdOn: 1 };
+        sort = { fullName: 1, createdOn: 1 };
         break;
     }
 
