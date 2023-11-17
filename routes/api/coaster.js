@@ -18,9 +18,12 @@ router.use(express.urlencoded({extended: false}));
 
 const newCoasterSchema = Joi.object({
   name: Joi.string().trim().required(),
+  formerNames: Joi.array().items(Joi.string().trim()),
   park: Joi.string().trim().required(),
   openingYear: Joi.number().integer().min(1700).max(2030).required(),
+  closingYear: Joi.number().integer().min(1700).max(2030),
   manufacturer: Joi.string().trim().required(),
+  status: Joi.string().trim().required(),
   length: Joi.string().trim().required(),
   height: Joi.string().trim().required(),
   drop: Joi.string().trim(),
@@ -71,6 +74,9 @@ router.get('/list', async (req, res) => {
         break;
       case 'manufacturer':
         sort = { manufacturer: 1, createdOn: 1 };
+        break;
+      case 'status':
+        sort = { status: 1, createdOn: 1 };
         break;
       case 'length':
         sort = { length: 1, createdOn: 1 };
