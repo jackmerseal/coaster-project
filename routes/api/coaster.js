@@ -8,6 +8,7 @@ import {
   connect,
   getCoasters,
   newId,
+  saveEdit,
 } from '../../database.js';
 import Joi from 'joi';
 import jwt from 'jsonwebtoken';
@@ -23,12 +24,14 @@ const newCoasterSchema = Joi.object({
   openingYear: Joi.number().integer().min(1700).max(2030).required(),
   closingYear: Joi.number().integer().min(1700).max(2030),
   manufacturer: Joi.string().trim().required(),
-  status: Joi.string().trim().required(),
+  status: Joi.string().trim().valid()
+  
+  required(),
   length: Joi.string().trim().required(),
   height: Joi.string().trim().required(),
   drop: Joi.string().trim(),
   speed: Joi.string().trim().required(),
-  inversions: Joi.number().integer().min(0).max(100),
+  inversions: Joi.number().integer().min(0).max(100).required(),
   gForce: Joi.number().integer().min(0),
 });
 
@@ -133,6 +136,32 @@ router.post('/new', validBody(newCoasterSchema), async (req, res) => {
     ...req.body,
     creationDate: new Date(),
   }
+
+  try {
+    const result = await addCoaster(newCoaster);
+
+    if(result.invalidFields){
+      res.status(400).json({message: `Invalid data!`});
+    }
+    if(result.duplicateCoaster){
+      res.status(409).json({message: `That coaster already exists!`});
+    }
+    if(result.insertResult){
+      const edit = {
+        timeStamp: new Date(),
+        op: 'Add',
+        collection: 'Coasters',
+        target: newCoaster._id,
+        update: newCoaster,
+        auth: req.auth,
+      };
+      await saveEdit(edit);
+      res.status(200).json({message: `Coaster ${newCoaster._id} added!`});
+    }
+  } catch(err) {
+    res.status(500).json({error: err.stack});
+  }
+
 });
   
 

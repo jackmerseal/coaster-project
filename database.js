@@ -147,6 +147,48 @@ async function getCoasters() {
   return coasters;
 }
 
+async function newCoaster(coaster) {
+  const db = await connect();
+  let inValidFields = '';
+  if (!coaster.name) {
+    inValidFields += 'Name, ';
+  }
+  if (!coaster.park) {
+    inValidFields += 'Park, ';
+  }
+  if (!coaster.openingYear) {
+    inValidFields += 'Opening Year, ';
+  }
+  if(!coaster.manufacturer){
+    inValidFields += 'Manufacturer, ';
+  }
+  if(!coaster.status){
+    inValidFields += 'Status, ';
+  }
+  if(!coaster.length){
+    inValidFields += 'Length, ';
+  }
+  if(!coaster.height){
+    inValidFields += 'Height, ';
+  }
+  if(!coaster.speed){
+    inValidFields += 'Speed, ';
+  }
+  if(!coaster.inversions){
+    inValidFields += 'Inversions, ';
+  }
+  if(inValidFields != ''){
+    return {invalidFields: inValidFields};
+  }
+  const foundCoaster = await db.collection('Coasters').findOne({ name: coaster.name, park: coaster.park });
+  if(foundCoaster == null){
+    const newCoaster = await db.collection('Coasters').insertOne(coaster);
+    return {insertResult: newCoaster, duplicateCoaster: false};
+  } else {
+    return {duplicateCoaster: true};
+  }
+}
+
 ping();
 
 export {connect, ping, getUsers, getUserById, registerUser, loginUser, updateUser, deleteUser, updateMe, getCoasters, newId, saveEdit, findRoleByName};
